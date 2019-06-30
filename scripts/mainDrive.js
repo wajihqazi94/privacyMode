@@ -19,6 +19,7 @@ geotab.addin.authoritySwitcher = function(api, state) {
 				let selectedAuthority = document.getElementById("importauthorities").value;
 				for (let i = 0; i < storedData.length; i++) {
 					if (storedData[i].authorityName === selectedAuthority) {
+						console.log(storedData[i]);
 
 						activeUser.authorityName = storedData[i].authorityName;
 						activeUser.companyName = storedData[i].companyName;
@@ -27,9 +28,9 @@ geotab.addin.authoritySwitcher = function(api, state) {
 						activeUser.carrierNumber = storedData[i].carrierNumber;
 						activeUser.driverGroups = [];
 						activeUser.companyGroups = [];
-						for (groupIndex = 0; groupIndex < storedData[i].groups.length; groupIndex++) {
-							activeUser.driverGroups.push({"id":storedData[i].groups[groupIndex].id});
-							activeUser.companyGroups.push({"id":storedData[i].groups[groupIndex].id});
+						for (let groupIndex = 0; groupIndex < storedData[i].groups.length; groupIndex++) {
+							activeUser.driverGroups.push({"id":storedData[i].groups[groupIndex]});
+							activeUser.companyGroups.push({"id":storedData[i].groups[groupIndex]});
 						}
 						
 						api.call("Set", {

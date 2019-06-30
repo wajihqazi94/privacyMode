@@ -74,9 +74,9 @@
 	<div id="authoritySwitcher" class="checkmateFormPage" style="visibility: visible;" data-page>
 	<div class="checkmateToolbarContainer">
 		<span>
-			<button class="btn" id="addAuth" title="Add changes">Add</button>
-			<button class="btn" id="saveEdit" style="display: none">Save Changes</button>
-			<button class="btn" id="clear" style="display: none">Delete</button>
+			<button class="btn authHeaderBtn" id="addAuth" title="Add changes">Add</button>
+			<button class="btn authHeaderBtn" id="saveEdit" style="display: none">Save Changes</button>
+			<button class="btn authHeaderBtn" id="clear" style="display: none">Delete</button>
 		</span>
 	</div>
 	<div class="checkmatePageHeader">
@@ -90,11 +90,11 @@
 	</div>
 	
 	<div id="authoritySwitcherTabs" class="vanillaTabsContainer">
-		<ul class="tabsHeader">
-			<li id="newTab" class="tabElement activeTab">New</li>
-			<li id="editTab" class="tabElement">Configuration</li>
+		<ul class="authTabHeader">
+			<li id="newTab" class="authTabElement activeTab">New</li>
+			<li id="editTab" class="authTabElement">Configuration</li>
 		</ul>
-		<div id="primaryTab" class="tabElement">
+		<div id="primaryTab" class="authTabElement">
 			<fieldset class="inset" id="authorityAddTab">
 				<legend>New Authority Configuration</legend>
 				<div class="checkmateField">
@@ -123,7 +123,7 @@
 				</div>
 			</fieldset>
 		</div>
-		<div id="secondaryTab" class="tabElement" style="display:none">
+		<div id="secondaryTab" class="authTabElement" style="display:none">
 			<fieldset class="inset" id="authorityEditTab">
 				<legend>Edit Authority</legend>
 				<div class="checkmateField" style>

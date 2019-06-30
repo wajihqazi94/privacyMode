@@ -6,6 +6,37 @@
 	text-decoration: none;
 }
 
+.authHeaderBtn {
+	margin-top: 17px;
+}
+
+.authTabHeader {
+	display: block;
+	border-bottom: 1px solid #c5dbec;
+	list-style-type: none;
+	padding: 0;
+}
+
+.authTabHeader ol, ul {
+	margin-bottom: 10px;
+}
+
+.authTabHeader>.authTabElement {
+	padding: 8px 12px;
+	color: #999;
+	display: inline-block;
+	cursor: pointer;
+	border-top-right-radius: 3px;
+	border-top-left-radius: 3px;
+	position: relative;
+	top: 1px;
+}
+
+.authTabHeader>.authTabElement.activeTab {
+	border: 1px solid #c5dbec;
+	border-bottom-color: #fefefe;
+}
+
 .authHelp {
 	padding-left: 6px;
 	text-align: center;
