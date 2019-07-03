@@ -19,19 +19,12 @@ geotab.addin.authoritySwitcher = function(api, state) {
 				let selectedAuthority = document.getElementById("importauthorities").value;
 				for (let i = 0; i < storedData.length; i++) {
 					if (storedData[i].authorityName === selectedAuthority) {
-						console.log(storedData[i]);
 
 						activeUser.authorityName = storedData[i].authorityName;
 						activeUser.companyName = storedData[i].companyName;
 						activeUser.companyAddress = storedData[i].companyAddress;
 						activeUser.authorityAddress = storedData[i].authorityAddress;
 						activeUser.carrierNumber = storedData[i].carrierNumber;
-						activeUser.driverGroups = [];
-						activeUser.companyGroups = [];
-						for (let groupIndex = 0; groupIndex < storedData[i].groups.length; groupIndex++) {
-							activeUser.driverGroups.push({"id":storedData[i].groups[groupIndex]});
-							activeUser.companyGroups.push({"id":storedData[i].groups[groupIndex]});
-						}
 						
 						api.call("Set", {
 							typeName: "User",
@@ -55,55 +48,97 @@ geotab.addin.authoritySwitcher = function(api, state) {
 				})
 			});
 		},
-
-        grabAddInData = function(activeUser) {
-            api.call("Get", {
-                    "typeName": "AddInData",
-                    "search": {
-                        "addInId": addInId
-                    }
-			}, function(results) {
-				for (let i = 0; i < results.length; i++) {
-
-					let myData = JSON.parse(results[i].data);
-					if (myData.hasOwnProperty('authorities')) {
-
-						for (let auth = 0; auth < myData.authorities.length; auth++) {
-							storedData.push(myData.authorities[auth]);
-						}
-
+		
+		grabGroup = function(groupId) {
+			return new Promise(function(resolve, reject) {
+				api.call("Get", {"typeName": "Group", 
+					"search": {
+						"id": groupId
 					}
-
-				}
-				//Checked if new Data to add
-				if (storedData.length > 0) {
-
-					//Grab All Data and display
-					for (let i = 0; i < storedData.length; i++) {
-						let select = document.getElementById("importauthorities");
-
-						storedData.sort(function(a, b) {
-							if (a.authorityName.toLowerCase() < b.authorityName.toLowerCase()) {
-								return -1;
-							}
-							if (a.authorityName.toLowerCase() > b.authorityName.toLowerCase()) {
-								return 1;
-							}
-							return 0;
-						});
-						for (i = 0; i < storedData.length; i++) {
-							if (storedData[i].authorityName !== activeUser.authorityName) {
-								let option = new Option();
-								option.text = storedData[i].authorityName;
-								option.value = storedData[i].authorityName;
-								select.add(option);
-							}
-						}
-					}
-				}
-			}, function(error) {
-				alert("error");
+				}, function(result) {
+					resolve(result);
+				}, function(e) {
+					reject(e);
+				});
 			});
+		},
+		
+		grabAddInData = function() {
+			return new Promise(function(resolve, reject) {
+				api.call("Get", {"typeName": "AddInData",
+					"search": {
+						"addInId": "aMO4bMooow0KlW2WdaT2suw"
+					}
+				}, function(result) {
+					resolve(JSON.parse(result[0].data));
+				})
+			})
+		},
+		
+		contain = function(target, access) {
+			return target.every(function(t) {
+				return access.includes(t);
+			});
+		},
+
+        populateSelect = async function(activeUser) {
+			let currentUser = activeUser,
+				accessList = [],
+				groups = [],
+				addInData = await grabAddInData();
+			for (let groupIndex = 0; groupIndex < currentUser.companyGroups.length; groupIndex++) {
+				groups.push(currentUser.companyGroups[groupIndex].id);
+			}
+			
+			if (currentUser.companyGroups[0].id === "GroupCompanyId") {
+				for (let authorityIndex = 0; authorityIndex < addInData.authorities.length; authorityIndex++) {
+						storedData.push(addInData.authorities[authorityIndex]);
+				}
+			} else {
+				while (groups.length > 0) {
+					let currentGroup = groups.shift();
+					accessList.push(currentGroup);
+					let groupDetails = await grabGroup(currentGroup),
+						children = groupDetails[0].children;
+					if (children.length > 0) {
+						for (let childIndex = 0; childIndex < children.length; childIndex++) {
+							groups.push(children[childIndex].id);
+						}
+					}
+				}
+				
+				for (let authorityIndex = 0; authorityIndex < addInData.authorities.length; authorityIndex++) {
+					if (contain(addInData.authorities[authorityIndex].groups, accessList)) {
+						storedData.push(addInData.authorities[authorityIndex]);
+					}
+				}
+			};
+			
+			if (storedData.length > 0) {
+
+				//Grab All Data and display
+				for (let i = 0; i < storedData.length; i++) {
+					let authSelect = document.getElementById("importauthorities");
+
+					storedData.sort(function(a, b) {
+						if (a.authorityName.toLowerCase() < b.authorityName.toLowerCase()) {
+							return -1;
+						}
+						if (a.authorityName.toLowerCase() > b.authorityName.toLowerCase()) {
+							return 1;
+						}
+						return 0;
+					});
+					for (i = 0; i < storedData.length; i++) {
+						if (storedData[i].authorityName !== activeUser.authorityName) {
+							let authOption = new Option();
+							authOption.text = storedData[i].authorityName;
+							authOption.value = storedData[i].authorityName;
+							authSelect.add(authOption);
+						}
+					}
+				}
+			}
         };
 
 
@@ -124,7 +159,7 @@ geotab.addin.authoritySwitcher = function(api, state) {
                 currentUser = session.userName;
 				grabUser().then(function(activeUser) {
 					current.innerHTML = activeUser.authorityName;
-					grabAddInData(activeUser);
+					populateSelect(activeUser);
 				});
                 
             });

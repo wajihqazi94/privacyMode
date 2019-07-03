@@ -2,6 +2,7 @@ geotab.addin.authoritySwitcher = function(api, state) {
 		let	addNew = document.getElementById("addAuth"),
 			saveChanges = document.getElementById("saveEdit"),
 			deleteAuth = document.getElementById("clear"),
+			helpButton = document.getElementById("authHelpButton"),
 			authorityDropDown = document.getElementById("import-authorities"),
 			groupsSelectBox = document.getElementById("import-groups"),
 			newSelectBox = document.getElementById("newGroups"),
@@ -39,7 +40,7 @@ geotab.addin.authoritySwitcher = function(api, state) {
 						});
 					} else {
 						document.getElementById("authoritySwitcherTabs").style.display = "none";
-						document.getElementById("helpButton").style.display = "none";
+						helpButton.style.display = "none";
 						addNew.disabled = true;
 						errorHandler("Administrator Clearance is required to use this add-in.")
 					}
@@ -323,7 +324,7 @@ geotab.addin.authoritySwitcher = function(api, state) {
 					
 					
 					addInObj[0].data = JSON.stringify(tempObj);
-					addInObj[0].groups = groups;
+					addInObj[0].groups = [{"id":"GroupCompanyId"}];
 					if ((groups.length > 0) && !emptyAuth ) {
 						api.call("Set", {"typeName": "AddInData",
 							"entity": addInObj[0]
@@ -579,6 +580,18 @@ geotab.addin.authoritySwitcher = function(api, state) {
 						title: "Confirmation",
 						content: "Are you sure you would like to delete this authority?"
 					});
+				}, false);
+				
+				helpButton.addEventListener("click", function() {
+					setDialog("open", {
+						title: "Help",
+						content: "This page allows you to configure authorities for your drivers to switch to in the Geotab Drive App. Please enter all appropriate fields and select the desired groups to save an authority configuration to your database.",
+						buttons: {
+							"Close": function() {
+								setDialog('close');
+							}
+						}
+					})
 				}, false);
 				
 				authorityDropDown.addEventListener("change", function() {
